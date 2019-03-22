@@ -1,0 +1,22 @@
+#lang typed/racket/base
+
+(provide (all-defined-out))
+
+(define (var-name? x)
+  (not (or (eqv? x 'U) (eqv? x 'Nat) (eqv? x 'zero)
+           (eqv? x 'add1) (eqv? x 'which-Nat) (eqv? x 'ind-Nat)
+           (eqv? x 'rec-Nat) (eqv? x 'iter-Nat)
+           (eqv? x '->) (eqv? x '→) (eqv? x 'Π) (eqv? x 'Pi) (eqv? x '∏) (eqv? x 'λ) (eqv? x 'lambda)
+           (eqv? x 'quote) (eqv? x 'Atom) (eqv? x 'Σ) (eqv? x 'Sigma) (eqv? x 'Pair)
+           (eqv? x 'cons) (eqv? x 'car) (eqv? x 'cdr)
+           (eqv? x 'Trivial) (eqv? x 'sole)
+           (eqv? x '::) (eqv? x 'nil) (eqv? x 'List)
+           (eqv? x 'rec-List) (eqv? x 'ind-List)
+           (eqv? x 'Absurd) (eqv? x 'ind-Absurd)
+           (eqv? x '=) (eqv? x 'same) (eqv? x 'replace)
+           (eqv? x 'symm) (eqv? x 'trans) (eqv? x 'cong) (eqv? x 'ind-=)
+           (eqv? x 'Vec) (eqv? x 'vec::) (eqv? x 'vecnil)
+           (eqv? x 'head) (eqv? x 'tail) (eqv? x 'ind-Vec)
+           (eqv? x 'Either) (eqv? x 'left) (eqv? x 'right)
+           (eqv? x 'ind-Either) (eqv? x 'the)
+           (eqv? x 'TODO))))
