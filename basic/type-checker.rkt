@@ -151,7 +151,7 @@
 
   ;; ---- test type-check ----
 
-  ;; identiry
+  ;; identity
   (check-equal?
    (type-check '(λ (A)
                   (λ (x) x))
