@@ -17,8 +17,8 @@
                                X))))))
 
                (define Pair2-alias
-                 (the (Π ((AP U))
-                          (Π ((BP U))
+                 (the (Π ((A U))
+                          (Π ((B U))
                               U))
                    Pair2))
                

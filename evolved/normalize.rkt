@@ -112,6 +112,8 @@
      ;; (printf "whnf-1-in-norm none-of-the-above v=~v\n" v)
      (raise (exn:fail:whnf-1-in-norm-no-rule-applies))]))
 
+;; eval-1
+
 (define (eval-1 v)
   ;; (printf "eval-1 brief-v=~v\n\n" (brief-v v))
   (match v
