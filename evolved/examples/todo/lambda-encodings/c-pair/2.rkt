@@ -1,24 +1,32 @@
 #lang racket
-(require "../../main.rkt")
+(require "../../../../main.rkt")
 
+;; test type alias
 (run-program '() 0 '() '()
              '(
-               (define Pair2
-                 (the (Π ((AP U))
-                          (Π ((BP U))
+               
+               (define C-Pair
+                 (the (Π ((A U))
+                          (Π ((B U))
                               U))
-                   (λ (APe)
-                     (λ (BPe)
+                   (λ (A)
+                     (λ (B)
                        (Π ((X U))
-                           (Π ((f (Π ((a APe))
-                                       (Π ((b BPe))
+                           (Π ((f (Π ((a A))
+                                       (Π ((b B))
                                            X))))
                                X))))))
 
+               (define C-Pair-alias
+                 (the (Π ((A U))
+                          (Π ((B U))
+                              U))
+                   C-Pair))
+               
                (define car2
                  (the (Π ((A U))
                           (Π ((B U))
-                              (Π ((p ((Pair2 A) B)))
+                              (Π ((p ((C-Pair-alias A) B)))
                                   A)))
                    (λ (A)
                      (λ (B)
@@ -27,7 +35,7 @@
                ;; (define car2
                ;;   (the (Π ((A U))
                ;;            (Π ((B U))
-               ;;                (Π ((p ((Pair2 A) B)))
+               ;;                (Π ((p ((C-Pair-alias A) B)))
                ;;                    A)))
                ;;     (λ (Ae)
                ;;       (λ (Be)

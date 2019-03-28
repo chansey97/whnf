@@ -1,6 +1,7 @@
 #lang racket
-(require "../main.rkt")
+(require "../../../../main.rkt")
 
+;; test + by smaller definitions
 (run-program '() 0 '() '()
              '(
 
@@ -31,4 +32,11 @@
 
                ;; (+ 2 3)
                ((+ (add1 (add1 zero))) (add1 (add1 (add1 zero))))
+
+               (NORM 0)
+               (NORM 1)
+               
+               (NORM-STEPS 0)
+               (NORM-STEPS 1)
+
                ))

@@ -1,6 +1,7 @@
 #lang racket
-(require "../main.rkt")
+(require "../../../../main.rkt")
 
+;; test n+0=n by smaller definitions
 (run-program '() 0 '() '()
              '(
                
@@ -31,32 +32,23 @@
 
                (define mot-n+=n
                  (the (Π ((k Nat))
-                                U)
-                         (λ (k)
-                           (= Nat ((+ k) zero) k))))
+                          U)
+                   (λ (k)
+                     (= Nat ((+ k) zero) k))))
 
                (define step-n+=n
                  (the (Π ((n-1 Nat))
-                                (Π ((n+0=n_n-1 (= Nat ((+ n-1) zero) n-1)))
-                                    (= Nat ((+ (add1 n-1)) zero) (add1 n-1))))
-                         (λ (n-1)
-                           (λ (n+0=n_n-1)
-                             (replace n+0=n_n-1
-                               (the (Π ((k Nat))
-                                        U)
-                                 (λ (k)
-                                   (= Nat (add1 ((+ n-1) zero)) (add1 k))))
-                               same)))))
+                          (Π ((n+0=n_n-1 (= Nat ((+ n-1) zero) n-1)))
+                              (= Nat ((+ (add1 n-1)) zero) (add1 n-1))))
+                   (λ (n-1)
+                     (λ (n+0=n_n-1)
+                       (replace n+0=n_n-1
+                         (the (Π ((k Nat))
+                                  U)
+                           (λ (k)
+                             (= Nat (add1 ((+ n-1) zero)) (add1 k))))
+                         same)))))
                
-               ;; (define n+0=n
-               ;;   (the (Π ((n Nat))
-               ;;            (= Nat ((+ n) zero) n))
-               ;;     (λ (n)
-               ;;       (ind-Nat n
-               ;;         mot-n+=n
-               ;;         same 
-               ;;         step-n+=n))))
-
                (define n+0=n
                  (the (Π ((n Nat))
                           (= Nat ((+ n) zero) n))
@@ -64,5 +56,13 @@
                      (ind-Nat n
                        mot-n+=n
                        same 
-                       TODO))))
+                       step-n+=n))))
+               
+               (n+0=n (add1 (add1 zero)))
+               
+               (NORM 0)
+               (NORM 1)
+               
+               (NORM-STEPS 0)
+               (NORM-STEPS 1)
                ))

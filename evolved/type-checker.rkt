@@ -353,10 +353,15 @@
     [`(replace ,target ,motive ,base)
      (match (whnf (infer-exp used-names k ρ Γ target))
        [(V-Clos usn env `(= ,A ,from ,to))
+        ;; (if (and (check-exp used-names k ρ Γ motive (V-Clos usn env `(Π ((x ,A)) U)))
+        ;;          (check-exp used-names k ρ Γ base (V-Clos usn env `(,motive ,from))))
+        ;;     (V-Clos used-names ρ `(,motive ,to))
+        ;;     (error 'infer-exp "replace, failed"))
         (if (and (check-exp used-names k ρ Γ motive (V-Clos usn env `(Π ((x ,A)) U)))
-                 (check-exp used-names k ρ Γ base (V-Clos usn env `(,motive ,from))))
-            (V-Clos used-names ρ `(,motive ,to))
-            (error 'infer-exp "replace, failed"))]
+                 (check-exp used-names k ρ Γ base (V-App (V-Clos used-names ρ motive) (V-Clos usn env from))))
+            (V-App (V-Clos used-names ρ motive) (V-Clos usn env to))
+            (error 'infer-exp "replace, failed"))
+        ]
        
        [non-EQ (error 'infer-exp "replace, expected =")])]
 

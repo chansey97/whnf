@@ -1,6 +1,7 @@
 #lang racket
-(require "../main.rkt")
+(require "../../../../main.rkt")
 
+;; test +
 (run-program '() 0 '() '()
              '(
                
@@ -22,10 +23,13 @@
                            (λ (n-1)
                              (λ (+_n-1)
                                (add1 +_n-1)))))))))
+               
+               ;; (+ 2 3)
+               ((+ (add1 (add1 zero))) (add1 (add1 (add1 zero))))
 
-               (define +1=add1
-                 (the (Π ((n Nat))
-                          (= Nat ((+ (add1 zero)) n) (add1 n)))
-                   (λ (n)
-                     same)))
+               (NORM 0)
+               (NORM 1)
+               
+               (NORM-STEPS 0)
+               (NORM-STEPS 1)
                ))
