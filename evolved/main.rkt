@@ -71,7 +71,7 @@
   (match what
     [`(TODO ,v)
      (let ((id (generate-id)))
-       (printf "TODO expected type (id=~v):\n" id)
+       (printf "TODO expected type id=~v:\n" id)
        (print-v v)
        (put id v))
      ]
