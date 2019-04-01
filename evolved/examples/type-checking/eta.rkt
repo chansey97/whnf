@@ -6,8 +6,8 @@
                
                (define eta-expansion
                  (the (Pi ((f (Pi ((x Nat)) Nat)))
-                        (= (Pi ((x Nat)) Nat) f (lambda (x) (f x))))
-                   (lambda (f)
+                        (= (Pi ((x Nat)) Nat) f (¦Ë (x) (f x))))
+                   (¦Ë (f)
                      same)))
 
                ;; infer-exp:
