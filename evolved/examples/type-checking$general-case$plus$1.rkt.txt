@@ -239,11 +239,9 @@ Normalize(FNF) expression 1 by steps:
 (Π ((n-1 Nat))
  (→ (= Nat
        (ind-Nat n-1
-          (λ (k)
-            Nat)
+          mot-+
           0
-          (λ (n-1 +_n-1)
-            (add1 +_n-1)))
+          step-+)
        n-1)
    (= Nat
      ((λ (n-1 +_n-1)
@@ -257,11 +255,9 @@ Normalize(FNF) expression 1 by steps:
 (Π ((n-1 Nat))
  (→ (= Nat
        (ind-Nat n-1
-          (λ (k)
-            Nat)
+          mot-+
           0
-          (λ (n-1 +_n-1)
-            (add1 +_n-1)))
+          step-+)
        n-1)
    (= Nat
      ((λ (+_n-1)
@@ -274,11 +270,9 @@ Normalize(FNF) expression 1 by steps:
 (Π ((n-1 Nat))
  (→ (= Nat
        (ind-Nat n-1
-          (λ (k)
-            Nat)
+          mot-+
           0
-          (λ (n-1 +_n-1)
-            (add1 +_n-1)))
+          step-+)
        n-1)
    (= Nat
      (add1 (ind-Nat n-1

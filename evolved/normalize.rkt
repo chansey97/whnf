@@ -23,6 +23,10 @@
 
 (struct exn:fail:whnf-1-in-norm-no-rule-applies ())
 
+(struct exn:fail:hnf-1-no-rule-applies ())
+
+(struct exn:fail:fnf-1-no-rule-applies ())
+
 ;; brief-v for debugging
 
 (define (brief-v v)
@@ -120,116 +124,138 @@
     (let ((v2 (whnf-1-in-norm v)))
       (whnf-in-norm v2))))
 
-;; eval-1
-
-(define (eval-1 v)
-  ;; (printf "eval-1 brief-v=~s\n\n" (brief-v v))
+;; hnf
+(define (hnf-1 v)
+  ;; (printf "hnf-1 brief-v=~s\n\n" (brief-v v))
   (match v
     [(V-Abs y body)
-     (V-Abs y (eval-1 body))]
+     (V-Abs y (hnf-1 body))]
     
     [(V-Pi y domain range)
-     (let-values ([(domain-succ? domain-v) (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies? (lambda (exn) (values #f domain))])
-                                             (values #t (eval-1 domain)))]
-                  [(range-succ? range-v) (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies? (lambda (exn) (values #f range))])
-                                           (values #t (eval-1 range)) )])
+     (let-values ([(domain-succ? domain-v) (with-handlers ([exn:fail:hnf-1-no-rule-applies? (lambda (exn) (values #f domain))])
+                                             (values #t (hnf-1 domain)))]
+                  [(range-succ? range-v) (with-handlers ([exn:fail:hnf-1-no-rule-applies? (lambda (exn) (values #f range))])
+                                           (values #t (hnf-1 range)) )])
        (if (or domain-succ? range-succ?)
            (V-Pi y domain-v range-v)
-           (raise (exn:fail:whnf-1-in-norm-no-rule-applies))))]
+           (raise (exn:fail:hnf-1-no-rule-applies))))]
     
     [(V-Add1 n)
-     (V-Add1 (eval-1 n))]
+     (V-Add1 (hnf-1 n))]
     
     [(V-Eq type from to)
-     (let-values ([(type-succ? type-v) (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies? (lambda (exn) (values #f type))])
-                                         (values #t (eval-1 type)))]
-                  [(from-succ? from-v) (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies? (lambda (exn) (values #f from))])
-                                         (values #t (eval-1 from)) )]
-                  [(to-succ? to-v) (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies? (lambda (exn) (values #f to))])
-                                     (values #t (eval-1 to)) )])
+     (let-values ([(type-succ? type-v) (with-handlers ([exn:fail:hnf-1-no-rule-applies? (lambda (exn) (values #f type))])
+                                         (values #t (hnf-1 type)))]
+                  [(from-succ? from-v) (with-handlers ([exn:fail:hnf-1-no-rule-applies? (lambda (exn) (values #f from))])
+                                         (values #t (hnf-1 from)) )]
+                  [(to-succ? to-v) (with-handlers ([exn:fail:hnf-1-no-rule-applies? (lambda (exn) (values #f to))])
+                                     (values #t (hnf-1 to)) )])
        (if (or type-succ? from-succ? to-succ?)
            (V-Eq type-v from-v to-v)
-           (raise (exn:fail:whnf-1-in-norm-no-rule-applies))))]
+           (raise (exn:fail:hnf-1-no-rule-applies))))]
 
-    ; force speed up by (eval-1 V-Abs/V-Pi/...)
+    ;;
     [(V-Clos usn env `(,(or 'λ 'lambda) (,x) ,b))
-     ;; (let* ((y (freshen usn x))
-     ;;        (neutral-y (N-var y)))
-     ;;   (V-Abs y (V-Clos (cons y usn) (extend env x neutral-y) b)))
-     (eval-1
-      (let* ((y (freshen usn x))
-             (neutral-y (N-var y)))
-        (V-Abs y (V-Clos (cons y usn) (extend env x neutral-y) b))))
+     (let* ((y (freshen usn x))
+            (neutral-y (N-var y)))
+       (V-Abs y (V-Clos (cons y usn) (extend env x neutral-y) b)))
      ]
     
     [(V-Clos usn env `(,(or 'Π 'Pi) ((,x ,a)) ,b))
-     ;; (let* ((y (freshen usn x))
-     ;;        (neutral-y (N-var y)))
-     ;;   (V-Pi y (V-Clos usn env a) (V-Clos (cons y usn) (extend env x neutral-y) b)))
-     (eval-1
-      (let* ((y (freshen usn x))
-             (neutral-y (N-var y)))
-        (V-Pi y (V-Clos usn env a) (V-Clos (cons y usn) (extend env x neutral-y) b))))
+     (let* ((y (freshen usn x))
+            (neutral-y (N-var y)))
+       (V-Pi y (V-Clos usn env a) (V-Clos (cons y usn) (extend env x neutral-y) b)))
      ]
 
     [(V-Clos usn env `(add1 ,n))
-     (eval-1
-      (V-Add1 (V-Clos usn env n)))]
+     (V-Add1 (V-Clos usn env n))]
 
     [(V-Clos usn env `(= ,A ,from ,to))
-     (eval-1
-      (V-Eq (V-Clos usn env A) (V-Clos usn env from) (V-Clos usn env to)))]
+     (V-Eq (V-Clos usn env A) (V-Clos usn env from) (V-Clos usn env to))]
 
     [_
-     ;; (whnf-1-in-norm v)
      (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies?
                       (lambda (exn)
-                        ;; (printf "eval-1 exn hander __ brief-v=~s\n\n" (brief-v v))
-                        (match v
-                          ;; neutral eliminator
-                          ;; The reason why we need eval-1 u is the (V-App u w) maybe like this: (V-App (V-App #(struct:N-var f1) (V-Clos a)) (V-Clos b))
-                          ;; There is still some N-var in the operator position, but (V-Clos a) which at operand position can continue to reduce
-                          [(V-App u w)
-                           (let-values ([(u-succ? u-v) (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies? (lambda (exn) (values #f u))])
-                                                         (values #t (eval-1 u)))]
-                                        [(w-succ? w-v) (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies? (lambda (exn) (values #f w))])
-                                                         (values #t (eval-1 w)))])
-                             (if (or u-succ? w-succ?) 
-                                 (V-App u-v w-v)
-                                 (raise (exn:fail:whnf-1-in-norm-no-rule-applies))))]
-                          
-                          [(V-Ind-Nat t m b s)
-                           (let-values ([(t-succ? t-v) (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies? (lambda (exn) (values #f t))])
-                                                         (values #t (eval-1 t)))]
-                                        [(m-succ? m-v) (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies? (lambda (exn) (values #f m))])
-                                                         (values #t (eval-1 m)))]
-                                        [(b-succ? b-v) (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies? (lambda (exn) (values #f b))])
-                                                         (values #t (eval-1 b)) )]
-                                        [(s-succ? s-v) (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies? (lambda (exn) (values #f s))])
-                                                         (values #t (eval-1 s)) )])
-                             (if (or t-succ? m-succ? b-succ? s-succ?)
-                                 (V-Ind-Nat t-v m-v b-v s-v)
-                                 (raise (exn:fail:whnf-1-in-norm-no-rule-applies))))]
-
-                          [(V-Replace t m b)
-                           (let-values ([(t-succ? t-v) (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies? (lambda (exn) (values #f t))])
-                                                         (values #t (eval-1 t)))]
-                                        [(m-succ? m-v) (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies? (lambda (exn) (values #f m))])
-                                                         (values #t (eval-1 m)))]
-                                        [(b-succ? b-v) (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies? (lambda (exn) (values #f b))])
-                                                         (values #t (eval-1 b)) )])
-                             (if (or t-succ? m-succ? b-succ?)
-                                 (V-Replace t-v m-v b-v)
-                                 (raise (exn:fail:whnf-1-in-norm-no-rule-applies))))]
-
-                          [_ ;; zero, Nat, same, N-var...
-                           (raise (exn:fail:whnf-1-in-norm-no-rule-applies))]
-                          
-                          ))])
-       ;; (printf "eval-1 __ whnf-1-in-norm will in\n")
+                        (raise (exn:fail:hnf-1-no-rule-applies)))])
        (whnf-1-in-norm v))
      ]
     ))
+
+
+;; fnf-1
+
+(define (fnf-1 v)
+
+  (with-handlers ([exn:fail:hnf-1-no-rule-applies?
+                   (lambda (exn)
+                     (match v
+                       [(V-Abs y body)
+                        (V-Abs y (fnf-1 body))]
+                       
+                       [(V-Pi y domain range)
+                        (let-values ([(domain-succ? domain-v) (with-handlers ([exn:fail:fnf-1-no-rule-applies? (lambda (exn) (values #f domain))])
+                                                                (values #t (fnf-1 domain)))]
+                                     [(range-succ? range-v) (with-handlers ([exn:fail:fnf-1-no-rule-applies? (lambda (exn) (values #f range))])
+                                                              (values #t (fnf-1 range)) )])
+                          (if (or domain-succ? range-succ?)
+                              (V-Pi y domain-v range-v)
+                              (raise (exn:fail:fnf-1-no-rule-applies))))]
+                       
+                       [(V-Add1 n)
+                        (V-Add1 (fnf-1 n))]
+                       
+                       [(V-Eq type from to)
+                        (let-values ([(type-succ? type-v) (with-handlers ([exn:fail:fnf-1-no-rule-applies? (lambda (exn) (values #f type))])
+                                                            (values #t (fnf-1 type)))]
+                                     [(from-succ? from-v) (with-handlers ([exn:fail:fnf-1-no-rule-applies? (lambda (exn) (values #f from))])
+                                                            (values #t (fnf-1 from)) )]
+                                     [(to-succ? to-v) (with-handlers ([exn:fail:fnf-1-no-rule-applies? (lambda (exn) (values #f to))])
+                                                        (values #t (fnf-1 to)) )])
+                          (if (or type-succ? from-succ? to-succ?)
+                              (V-Eq type-v from-v to-v)
+                              (raise (exn:fail:fnf-1-no-rule-applies))))]
+
+                       ;; neutral eliminator
+                       ;; The reason why we need fnf-1 u is the (V-App u w) maybe like this: (V-App (V-App #(struct:N-var f1) (V-Clos a)) (V-Clos b))
+                       ;; There is still some N-var in the operator position, but (V-Clos a) which at operand position can continue to reduce
+                       [(V-App u w)
+                        (let-values ([(u-succ? u-v) (with-handlers ([exn:fail:fnf-1-no-rule-applies? (lambda (exn) (values #f u))])
+                                                      (values #t (fnf-1 u)))]
+                                     [(w-succ? w-v) (with-handlers ([exn:fail:fnf-1-no-rule-applies? (lambda (exn) (values #f w))])
+                                                      (values #t (fnf-1 w)))])
+                          (if (or u-succ? w-succ?) 
+                              (V-App u-v w-v)
+                              (raise (exn:fail:fnf-1-no-rule-applies))))]
+                       
+                       [(V-Ind-Nat t m b s)
+                        (let-values ([(t-succ? t-v) (with-handlers ([exn:fail:fnf-1-no-rule-applies? (lambda (exn) (values #f t))])
+                                                      (values #t (fnf-1 t)))]
+                                     [(m-succ? m-v) (with-handlers ([exn:fail:fnf-1-no-rule-applies? (lambda (exn) (values #f m))])
+                                                      (values #t (fnf-1 m)))]
+                                     [(b-succ? b-v) (with-handlers ([exn:fail:fnf-1-no-rule-applies? (lambda (exn) (values #f b))])
+                                                      (values #t (fnf-1 b)) )]
+                                     [(s-succ? s-v) (with-handlers ([exn:fail:fnf-1-no-rule-applies? (lambda (exn) (values #f s))])
+                                                      (values #t (fnf-1 s)) )])
+                          (if (or t-succ? m-succ? b-succ? s-succ?)
+                              (V-Ind-Nat t-v m-v b-v s-v)
+                              (raise (exn:fail:fnf-1-no-rule-applies))))]
+
+                       [(V-Replace t m b)
+                        (let-values ([(t-succ? t-v) (with-handlers ([exn:fail:fnf-1-no-rule-applies? (lambda (exn) (values #f t))])
+                                                      (values #t (fnf-1 t)))]
+                                     [(m-succ? m-v) (with-handlers ([exn:fail:fnf-1-no-rule-applies? (lambda (exn) (values #f m))])
+                                                      (values #t (fnf-1 m)))]
+                                     [(b-succ? b-v) (with-handlers ([exn:fail:fnf-1-no-rule-applies? (lambda (exn) (values #f b))])
+                                                      (values #t (fnf-1 b)) )])
+                          (if (or t-succ? m-succ? b-succ?)
+                              (V-Replace t-v m-v b-v)
+                              (raise (exn:fail:fnf-1-no-rule-applies))))]
+
+                       [_ ;; zero, Nat, same, N-var...
+                        (raise (exn:fail:fnf-1-no-rule-applies))]
+                       ))])
+    (hnf-1 v))
+  )
 
 ;; read-back to syntax
 
@@ -259,7 +285,7 @@
      (let* ((y (freshen used-names x))
             (neutral-y (N-var y)))
        `(Π ((,y ,(subst-in-expr used-names ρ a)))
-            ,(subst-in-expr (cons y used-names) (extend ρ x neutral-y) b)))]
+          ,(subst-in-expr (cons y used-names) (extend ρ x neutral-y) b)))]
 
     [`(add1 ,n)
      `(add1 ,(subst-in-expr used-names ρ n))]
@@ -294,11 +320,11 @@
     ))
 
 (define (fnf v)
-  (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies?
+  (with-handlers ([exn:fail:fnf-1-no-rule-applies?
                    (lambda (exn) v)])
     (for ([i (in-naturals)])
       ;; (printf "fnf brief-v=~s\n\n" (brief-v v))
-      (set! v (eval-1 v)))))
+      (set! v (fnf-1 v)))))
 
 ;; print
 (define (print-v v)
@@ -318,10 +344,10 @@
   (pprint-pie (resugar expr))
   ;; (pprint-pie expr)
   (printf "\n")
-  (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies? (lambda (exn) (void))])
+  (with-handlers ([exn:fail:fnf-1-no-rule-applies? (lambda (exn) (void))])
     (for ([i (in-naturals)])
       ;; (printf "fnf all-steps brief-v=~s\n\n" (brief-v v))
-      (let* ((v2 (eval-1 v))
+      (let* ((v2 (fnf-1 v))
              (expr2 (read-back-1 v2)))
         (when (not (equal? expr expr2))
           (pprint-pie (resugar expr2))
@@ -333,9 +359,9 @@
 (define (print-v-fnf-all-steps-no-filter-duplicate v)
   (pprint-pie (read-back-1 v))
   (printf "\n")
-  (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies? (lambda (exn) (void))])
+  (with-handlers ([exn:fail:fnf-1-no-rule-applies? (lambda (exn) (void))])
     (for ([i (in-naturals)])
-      (let* ((v2 (eval-1 v)))
+      (let* ((v2 (fnf-1 v)))
         (pprint-pie (read-back-1 v2))
         (printf "\n")
         (set! v v2)))))
