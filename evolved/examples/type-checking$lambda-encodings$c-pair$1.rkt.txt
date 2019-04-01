@@ -1,0 +1,26 @@
+Type id=28:
+A
+Value(WHNF) id=29:
+0
+Type id=30:
+B
+Value(WHNF) id=31:
+1
+Normalize(FNF) expression 0:
+(= Nat
+  (add1 (ind-Nat n-1
+           (λ (k)
+             Nat)
+           0
+           (λ (n-1 +_n-1)
+             (add1 +_n-1))))
+  (add1 n-1))
+Normalize(FNF) expression 2:
+(= Nat
+  (add1 (ind-Nat n-1
+           (λ (k)
+             Nat)
+           0
+           (λ (n-1 +_n-1)
+             (add1 +_n-1))))
+  (add1 n-1))

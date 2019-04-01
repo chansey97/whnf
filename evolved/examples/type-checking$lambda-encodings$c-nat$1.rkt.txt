@@ -1,0 +1,69 @@
+Type id=20:
+C-Nat
+Value(WHNF) id=21:
+(λ (A s b)
+  (s (c-zero A s b)))
+Type id=22:
+C-Nat
+Value(WHNF) id=23:
+(λ (A s b)
+  (s (c-add1 c-zero A s b)))
+Type id=24:
+C-Nat
+Value(WHNF) id=25:
+(λ (A s b)
+  (s (c-add1 (c-add1 c-zero)
+       A
+       s
+       b)))
+Normalize(FNF) expression 0:
+(= Nat
+  (add1 (ind-Nat n-1
+           (λ (k)
+             Nat)
+           0
+           (λ (n-1 +_n-1)
+             (add1 +_n-1))))
+  (add1 n-1))
+Normalize(FNF) expression 1:
+(Π ((n-1 Nat))
+ (→ (= Nat
+       (ind-Nat n-1
+          (λ (k)
+            Nat)
+          0
+          (λ (n-1 +_n-1)
+            (add1 +_n-1)))
+       n-1)
+   (= Nat
+     (add1 (ind-Nat n-1
+              (λ (k)
+                Nat)
+              0
+              (λ (n-1 +_n-1)
+                (add1 +_n-1))))
+     (add1 n-1))))
+Normalize(FNF) expression 3:
+(Π ((n-1 Nat))
+ (→ (= Nat
+       (ind-Nat n-1
+          (λ (k)
+            Nat)
+          0
+          (λ (n-1 +_n-1)
+            (add1 +_n-1)))
+       n-1)
+   (= Nat
+     (add1 (ind-Nat n-1
+              (λ (k)
+                Nat)
+              0
+              (λ (n-1 +_n-1)
+                (add1 +_n-1))))
+     (add1 n-1))))
+Normalize(FNF) expression 5:
+(→ (Π ((X U))
+     (→ (→ A B
+           X)
+       X))
+  A)

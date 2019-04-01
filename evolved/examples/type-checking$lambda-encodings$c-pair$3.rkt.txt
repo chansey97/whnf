@@ -1,0 +1,37 @@
+Type id=34:
+(C-Pair B A)
+Value(WHNF) id=35:
+(λ (X f1)
+  (f1 (c-cdr Nat
+        Nat
+        (c-cons Nat Nat 0 1))
+    (c-car Nat
+      Nat
+      (c-cons Nat Nat 0 1))))
+Normalize(FNF) expression 0:
+(= Nat
+  (add1 (ind-Nat n-1
+           (λ (k)
+             Nat)
+           0
+           (λ (n-1 +_n-1)
+             (add1 +_n-1))))
+  (add1 n-1))
+Normalize(FNF) expression 1:
+(Π ((n-1 Nat))
+ (→ (= Nat
+       (ind-Nat n-1
+          (λ (k)
+            Nat)
+          0
+          (λ (n-1 +_n-1)
+            (add1 +_n-1)))
+       n-1)
+   (= Nat
+     (add1 (ind-Nat n-1
+              (λ (k)
+                Nat)
+              0
+              (λ (n-1 +_n-1)
+                (add1 +_n-1))))
+     (add1 n-1))))

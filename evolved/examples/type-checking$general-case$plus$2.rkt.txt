@@ -1,0 +1,299 @@
+Type id=18:
+Nat
+Value(WHNF) id=19:
+(add1 (ind-Nat 1
+         mot-+
+         3
+         step-+))
+Normalize(FNF) expression 0:
+(= Nat
+  (add1 (ind-Nat n-1
+           (λ (k)
+             Nat)
+           0
+           (λ (n-1 +_n-1)
+             (add1 +_n-1))))
+  (add1 n-1))
+Normalize(FNF) expression 1:
+(Π ((n-1 Nat))
+ (→ (= Nat
+       (ind-Nat n-1
+          (λ (k)
+            Nat)
+          0
+          (λ (n-1 +_n-1)
+            (add1 +_n-1)))
+       n-1)
+   (= Nat
+     (add1 (ind-Nat n-1
+              (λ (k)
+                Nat)
+              0
+              (λ (n-1 +_n-1)
+                (add1 +_n-1))))
+     (add1 n-1))))
+Normalize(FNF) expression 0 by steps:
+(= Nat
+  (+ (add1 n-1)
+    0)
+  (add1 n-1))
+(= Nat
+  ((λ (n j)
+     (ind-Nat n
+        (the (→ Nat
+               U)
+          (λ (k)
+            Nat))
+        j
+        (the (→ Nat Nat
+               Nat)
+          (λ (n-1 +_n-1)
+            (add1 +_n-1)))))
+    (add1 n-1)
+    0)
+  (add1 n-1))
+(= Nat
+  ((λ (j)
+     (ind-Nat (add1 n-1)
+        (the (→ Nat
+               U)
+          (λ (k)
+            Nat))
+        j
+        (the (→ Nat Nat
+               Nat)
+          (λ (n-1 +_n-1)
+            (add1 +_n-1)))))
+    0)
+  (add1 n-1))
+(= Nat
+  (ind-Nat (add1 n-1)
+     (the (→ Nat
+            U)
+       (λ (k)
+         Nat))
+     0
+     (the (→ Nat Nat
+            Nat)
+       (λ (n-1 +_n-1)
+         (add1 +_n-1))))
+  (add1 n-1))
+(= Nat
+  ((the (→ Nat Nat
+          Nat)
+     (λ (n-1 +_n-1)
+       (add1 +_n-1)))
+    n-1
+    (ind-Nat n-1
+       (the (→ Nat
+              U)
+         (λ (k)
+           Nat))
+       0
+       (the (→ Nat Nat
+              Nat)
+         (λ (n-1 +_n-1)
+           (add1 +_n-1)))))
+  (add1 n-1))
+(= Nat
+  ((λ (n-1 +_n-1)
+     (add1 +_n-1))
+    n-1
+    (ind-Nat n-1
+       (the (→ Nat
+              U)
+         (λ (k)
+           Nat))
+       0
+       (the (→ Nat Nat
+              Nat)
+         (λ (n-1 +_n-1)
+           (add1 +_n-1)))))
+  (add1 n-1))
+(= Nat
+  ((λ (+_n-1)
+     (add1 +_n-1))
+    (ind-Nat n-1
+       (the (→ Nat
+              U)
+         (λ (k)
+           Nat))
+       0
+       (the (→ Nat Nat
+              Nat)
+         (λ (n-1 +_n-1)
+           (add1 +_n-1)))))
+  (add1 n-1))
+(= Nat
+  (add1 (ind-Nat n-1
+           (the (→ Nat
+                  U)
+             (λ (k)
+               Nat))
+           0
+           (the (→ Nat Nat
+                  Nat)
+             (λ (n-1 +_n-1)
+               (add1 +_n-1)))))
+  (add1 n-1))
+(= Nat
+  (add1 (ind-Nat n-1
+           (λ (k)
+             Nat)
+           0
+           (λ (n-1 +_n-1)
+             (add1 +_n-1))))
+  (add1 n-1))
+Normalize(FNF) expression 1 by steps:
+(Π ((n-1 Nat))
+ (→ (mot-n+=n n-1)
+   (mot-n+=n (add1 n-1))))
+(Π ((n-1 Nat))
+ (→ ((λ (k)
+        (= Nat
+          (+ k 0)
+          k))
+       n-1)
+   ((λ (k)
+      (= Nat
+        (+ k 0)
+        k))
+     (add1 n-1))))
+(Π ((n-1 Nat))
+ (→ (= Nat
+       (+ n-1 0)
+       n-1)
+   (= Nat
+     (+ (add1 n-1)
+       0)
+     (add1 n-1))))
+(Π ((n-1 Nat))
+ (→ (= Nat
+       ((λ (n j)
+          (ind-Nat n
+             mot-+
+             j
+             step-+))
+         n-1
+         0)
+       n-1)
+   (= Nat
+     ((λ (n j)
+        (ind-Nat n
+           mot-+
+           j
+           step-+))
+       (add1 n-1)
+       0)
+     (add1 n-1))))
+(Π ((n-1 Nat))
+ (→ (= Nat
+       ((λ (j)
+          (ind-Nat n-1
+             mot-+
+             j
+             step-+))
+         0)
+       n-1)
+   (= Nat
+     ((λ (j)
+        (ind-Nat (add1 n-1)
+           mot-+
+           j
+           step-+))
+       0)
+     (add1 n-1))))
+(Π ((n-1 Nat))
+ (→ (= Nat
+       (ind-Nat n-1
+          mot-+
+          0
+          step-+)
+       n-1)
+   (= Nat
+     (ind-Nat (add1 n-1)
+        mot-+
+        0
+        step-+)
+     (add1 n-1))))
+(Π ((n-1 Nat))
+ (→ (= Nat
+       (ind-Nat n-1
+          mot-+
+          0
+          step-+)
+       n-1)
+   (= Nat
+     (step-+ n-1
+       (ind-Nat n-1
+          mot-+
+          0
+          step-+))
+     (add1 n-1))))
+(Π ((n-1 Nat))
+ (→ (= Nat
+       (ind-Nat n-1
+          (λ (k)
+            Nat)
+          0
+          (λ (n-1 +_n-1)
+            (add1 +_n-1)))
+       n-1)
+   (= Nat
+     ((λ (n-1 +_n-1)
+        (add1 +_n-1))
+       n-1
+       (ind-Nat n-1
+          mot-+
+          0
+          step-+))
+     (add1 n-1))))
+(Π ((n-1 Nat))
+ (→ (= Nat
+       (ind-Nat n-1
+          (λ (k)
+            Nat)
+          0
+          (λ (n-1 +_n-1)
+            (add1 +_n-1)))
+       n-1)
+   (= Nat
+     ((λ (+_n-1)
+        (add1 +_n-1))
+       (ind-Nat n-1
+          mot-+
+          0
+          step-+))
+     (add1 n-1))))
+(Π ((n-1 Nat))
+ (→ (= Nat
+       (ind-Nat n-1
+          (λ (k)
+            Nat)
+          0
+          (λ (n-1 +_n-1)
+            (add1 +_n-1)))
+       n-1)
+   (= Nat
+     (add1 (ind-Nat n-1
+              mot-+
+              0
+              step-+))
+     (add1 n-1))))
+(Π ((n-1 Nat))
+ (→ (= Nat
+       (ind-Nat n-1
+          (λ (k)
+            Nat)
+          0
+          (λ (n-1 +_n-1)
+            (add1 +_n-1)))
+       n-1)
+   (= Nat
+     (add1 (ind-Nat n-1
+              (λ (k)
+                Nat)
+              0
+              (λ (n-1 +_n-1)
+                (add1 +_n-1))))
+     (add1 n-1))))
