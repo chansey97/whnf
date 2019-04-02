@@ -94,25 +94,20 @@
     ;; TODO: check why we can not force speed up whnf by (whnf-1-in-norm (V-Clos ...)) ????
     
     [(V-Clos usn env `(the ,e1 ,e2))
-     ;; (whnf-1-in-norm (V-Clos usn env e2))
      (V-Clos usn env e2)
      ]
 
     [(V-Clos usn env `(ind-Nat ,target ,motive ,base ,step))
-     ;; (whnf-1-in-norm (V-Ind-Nat (V-Clos usn env target) (V-Clos usn env motive) (V-Clos usn env base) (V-Clos usn env step)))
      (V-Ind-Nat (V-Clos usn env target) (V-Clos usn env motive) (V-Clos usn env base) (V-Clos usn env step))
      ]
     
     [(V-Clos usn env `(replace ,target ,motive ,base))
-     ;; (whnf-1-in-norm (V-Replace (V-Clos usn env target) (V-Clos usn env motive) (V-Clos usn env base)))
      (V-Replace (V-Clos usn env target) (V-Clos usn env motive) (V-Clos usn env base))
      ]
     
-    [(V-Clos usn env `(,e1 ,e2))
-     ;; (printf "whnf-1-in-norm (,e1 ,e2)=~v\n\n" `(,e1 ,e2))
-     ;; (whnf-1-in-norm (V-App (V-Clos usn env e1) (V-Clos usn env e2)))
-     (V-App (V-Clos usn env e1) (V-Clos usn env e2))
-     ]
+    [(V-Clos usn env `(,e1 ,e2)) #:when (not (keyword? e1)) ;; note: (add1 n) not a function application
+                                 (V-App (V-Clos usn env e1) (V-Clos usn env e2))
+                                 ]
     
     [none-of-the-above ; no rule apply when meet a constructor at the top
      ;; (printf "whnf-1-in-norm none-of-the-above v=~v\n" v)
