@@ -127,59 +127,62 @@
 ;; hnf
 (define (hnf-1 v)
   ;; (printf "hnf-1 brief-v=~s\n\n" (brief-v v))
-  (match v
-    [(V-Abs y body)
-     (V-Abs y (hnf-1 body))]
-    
-    [(V-Pi y domain range)
-     (let-values ([(domain-succ? domain-v) (with-handlers ([exn:fail:hnf-1-no-rule-applies? (lambda (exn) (values #f domain))])
-                                             (values #t (hnf-1 domain)))]
-                  [(range-succ? range-v) (with-handlers ([exn:fail:hnf-1-no-rule-applies? (lambda (exn) (values #f range))])
-                                           (values #t (hnf-1 range)) )])
-       (if (or domain-succ? range-succ?)
-           (V-Pi y domain-v range-v)
-           (raise (exn:fail:hnf-1-no-rule-applies))))]
-    
-    [(V-Add1 n)
-     (V-Add1 (hnf-1 n))]
-    
-    [(V-Eq type from to)
-     (let-values ([(type-succ? type-v) (with-handlers ([exn:fail:hnf-1-no-rule-applies? (lambda (exn) (values #f type))])
-                                         (values #t (hnf-1 type)))]
-                  [(from-succ? from-v) (with-handlers ([exn:fail:hnf-1-no-rule-applies? (lambda (exn) (values #f from))])
-                                         (values #t (hnf-1 from)) )]
-                  [(to-succ? to-v) (with-handlers ([exn:fail:hnf-1-no-rule-applies? (lambda (exn) (values #f to))])
-                                     (values #t (hnf-1 to)) )])
-       (if (or type-succ? from-succ? to-succ?)
-           (V-Eq type-v from-v to-v)
-           (raise (exn:fail:hnf-1-no-rule-applies))))]
+  (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies?
+                   (lambda (exn)
+                     (match v
 
-    ;;
-    [(V-Clos usn env `(,(or 'λ 'lambda) (,x) ,b))
-     (let* ((y (freshen usn x))
-            (neutral-y (N-var y)))
-       (V-Abs y (V-Clos (cons y usn) (extend env x neutral-y) b)))
-     ]
-    
-    [(V-Clos usn env `(,(or 'Π 'Pi) ((,x ,a)) ,b))
-     (let* ((y (freshen usn x))
-            (neutral-y (N-var y)))
-       (V-Pi y (V-Clos usn env a) (V-Clos (cons y usn) (extend env x neutral-y) b)))
-     ]
+                       [(V-Abs y body)
+                        (V-Abs y (hnf-1 body))]
+                       
+                       [(V-Pi y domain range)
+                        (let-values ([(domain-succ? domain-v) (with-handlers ([exn:fail:hnf-1-no-rule-applies? (lambda (exn) (values #f domain))])
+                                                                (values #t (hnf-1 domain)))]
+                                     [(range-succ? range-v) (with-handlers ([exn:fail:hnf-1-no-rule-applies? (lambda (exn) (values #f range))])
+                                                              (values #t (hnf-1 range)) )])
+                          (if (or domain-succ? range-succ?)
+                              (V-Pi y domain-v range-v)
+                              (raise (exn:fail:hnf-1-no-rule-applies))))]
+                       
+                       [(V-Add1 n)
+                        (V-Add1 (hnf-1 n))]
+                       
+                       [(V-Eq type from to)
+                        (let-values ([(type-succ? type-v) (with-handlers ([exn:fail:hnf-1-no-rule-applies? (lambda (exn) (values #f type))])
+                                                            (values #t (hnf-1 type)))]
+                                     [(from-succ? from-v) (with-handlers ([exn:fail:hnf-1-no-rule-applies? (lambda (exn) (values #f from))])
+                                                            (values #t (hnf-1 from)) )]
+                                     [(to-succ? to-v) (with-handlers ([exn:fail:hnf-1-no-rule-applies? (lambda (exn) (values #f to))])
+                                                        (values #t (hnf-1 to)) )])
+                          (if (or type-succ? from-succ? to-succ?)
+                              (V-Eq type-v from-v to-v)
+                              (raise (exn:fail:hnf-1-no-rule-applies))))]
 
-    [(V-Clos usn env `(add1 ,n))
-     (V-Add1 (V-Clos usn env n))]
+                       ;;
+                       [(V-Clos usn env `(,(or 'λ 'lambda) (,x) ,b))
+                        (let* ((y (freshen usn x))
+                               (neutral-y (N-var y)))
+                          (V-Abs y (V-Clos (cons y usn) (extend env x neutral-y) b)))
+                        ]
+                       
+                       [(V-Clos usn env `(,(or 'Π 'Pi) ((,x ,a)) ,b))
+                        (let* ((y (freshen usn x))
+                               (neutral-y (N-var y)))
+                          (V-Pi y (V-Clos usn env a) (V-Clos (cons y usn) (extend env x neutral-y) b)))
+                        ]
 
-    [(V-Clos usn env `(= ,A ,from ,to))
-     (V-Eq (V-Clos usn env A) (V-Clos usn env from) (V-Clos usn env to))]
+                       [(V-Clos usn env `(add1 ,n))
+                        (V-Add1 (V-Clos usn env n))]
 
-    [_
-     (with-handlers ([exn:fail:whnf-1-in-norm-no-rule-applies?
-                      (lambda (exn)
-                        (raise (exn:fail:hnf-1-no-rule-applies)))])
-       (whnf-1-in-norm v))
-     ]
-    ))
+                       [(V-Clos usn env `(= ,A ,from ,to))
+                        (V-Eq (V-Clos usn env A) (V-Clos usn env from) (V-Clos usn env to))]
+
+                       [_ ;; zero, Nat, same, N-var, V-App, V-Ind-Nat, ...
+                        (raise (exn:fail:hnf-1-no-rule-applies))]
+                       )
+                     
+                     )])
+    (whnf-1-in-norm v))
+  )
 
 
 ;; fnf-1

@@ -165,6 +165,21 @@ Normalize(FNF) expression 1 by steps:
        n-1)
    (= Nat
      (add1 (ind-Nat n-1
+              mot-+
+              0
+              step-+))
+     (add1 n-1))))
+(Π ((n-1 Nat))
+ (→ (= Nat
+       (ind-Nat n-1
+          (λ (k)
+            Nat)
+          0
+          (λ (n-1 +_n-1)
+            (add1 +_n-1)))
+       n-1)
+   (= Nat
+     (add1 (ind-Nat n-1
               (λ (k)
                 Nat)
               0
