@@ -86,7 +86,7 @@
     [(V-Clos _ env x) #:when (var? x)
                       (let ((v (lookup x env)))
                         (match v
-                          [(V-Gen x _) (N-var x)]
+                          [(V-Gen _ x) (N-var x)]
                           [(N-var _) v]
                           [(V-EagerClos w) w]
                           [_ v]))]
@@ -270,7 +270,7 @@
        ;; (printf "subst-in-expr var? e=~v\n" e)
        (match (lookup x ρ)
          [(N-var x) x]
-         [(V-Gen x k) x]
+         [(V-Gen k x) x]
          ;; [(V-EagerClos (V-Clos usn ρ e)) (subst-in-expr usn ρ e)]
          [(V-EagerClos w) (read-back-1 w)]
          [_ x])]

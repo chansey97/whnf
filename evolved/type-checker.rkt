@@ -38,7 +38,7 @@
 
 (struct V-Clos (usn env exp)
   #:transparent)
-(struct V-Gen (x k)
+(struct V-Gen (k x)
   #:transparent)
 
 (struct V-App (rator rand)
@@ -131,7 +131,7 @@
      #:when (keyword? kw) ; e.g: U, Nat, zero, ...
      #t]
 
-    [((V-Gen x1 k1) (V-Gen x2 k2))
+    [((V-Gen k1 x1) (V-Gen k2 x2))
      (= k1 k2)]
 
     ;; function
@@ -142,8 +142,8 @@
       (V-Clos usn2 env2 `(,(or 'λ 'lambda) (,x2) ,e2)))
      (let* ((y1 (freshen usn1 x1))
             (y2 (freshen usn2 x2))
-            (neutral-y1 (V-Gen y1 k))
-            (neutral-y2 (V-Gen y2 k)))
+            (neutral-y1 (V-Gen k y1))
+            (neutral-y2 (V-Gen k y2)))
        (eq-val? (+ k 1)
                 (V-Clos (cons y1 usn1) (extend env1 x1 neutral-y1) e1)
                 (V-Clos (cons y2 usn2) (extend env2 x2 neutral-y2) e2)))]
@@ -152,8 +152,8 @@
       (V-Clos usn2 env2 `(,(or 'Π 'Pi) ((,x2 ,a2)) ,b2)))
      (let*((y1 (freshen usn1 x1))
            (y2 (freshen usn2 x2))
-           (neutral-y1 (V-Gen y1 k))
-           (neutral-y2 (V-Gen y2 k)))
+           (neutral-y1 (V-Gen k y1))
+           (neutral-y2 (V-Gen k y2)))
        (and (eq-val? k (V-Clos usn1 env1 a1) (V-Clos usn2 env2 a2))
             (eq-val? (+ k 1)
                      (V-Clos (cons y1 usn1) (extend env1 x1 neutral-y1) b1)
@@ -204,7 +204,7 @@
      (match (whnf v)
        [(V-Clos usn env `(,(or 'Π 'Pi) ((,y ,a)) ,b))
         (let* ((x-new (freshen used-names x))
-               (neutral-x-new (V-Gen x-new k)))
+               (neutral-x-new (V-Gen k x-new)))
           (check-exp (cons x-new used-names)
                      (+ k 1)
                      (extend ρ x neutral-x-new)
@@ -216,7 +216,7 @@
        [(V-Clos _ _ 'U) 
         (and (check-type used-names k ρ Γ a)
              (let* ((y (freshen used-names x))
-                    (neutral-y (V-Gen y k)))
+                    (neutral-y (V-Gen k y)))
                (check-type (cons y used-names)
                            (+ k 1)
                            (extend ρ x neutral-y)
