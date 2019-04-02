@@ -257,6 +257,13 @@
     (hnf-1 v))
   )
 
+(define (fnf v)
+  (with-handlers ([exn:fail:fnf-1-no-rule-applies?
+                   (lambda (exn) v)])
+    (for ([i (in-naturals)])
+      ;; (printf "fnf brief-v=~s\n\n" (brief-v v))
+      (set! v (fnf-1 v)))))
+
 ;; read-back to syntax
 
 (define (subst-in-expr used-names ρ e)
@@ -318,13 +325,6 @@
     [(V-Add1 n) `(add1 ,(read-back-1 n))]
     [(V-Eq type from to) `(= ,(read-back-1 type) ,(read-back-1 from) ,(read-back-1 to))]
     ))
-
-(define (fnf v)
-  (with-handlers ([exn:fail:fnf-1-no-rule-applies?
-                   (lambda (exn) v)])
-    (for ([i (in-naturals)])
-      ;; (printf "fnf brief-v=~s\n\n" (brief-v v))
-      (set! v (fnf-1 v)))))
 
 ;; print
 (define (print-v v)
