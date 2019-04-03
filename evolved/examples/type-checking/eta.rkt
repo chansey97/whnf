@@ -1,13 +1,13 @@
 #lang racket
-(require "../main.rkt")
+(require "../../main.rkt")
 
 (run-program '() 0 '() '()
              '(
                
                (define eta-expansion
                  (the (Pi ((f (Pi ((x Nat)) Nat)))
-                        (= (Pi ((x Nat)) Nat) f (¦Ë (x) (f x))))
-                   (¦Ë (f)
+                        (= (Pi ((x Nat)) Nat) f (Î» (x) (f x))))
+                   (Î» (f)
                      same)))
 
                ;; infer-exp:
